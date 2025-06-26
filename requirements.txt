@@ -1,0 +1,19 @@
+# Core dependencies for RAG chatbot
+langchain==0.1.0
+langchain-google-genai==1.0.1
+qdrant-client==1.7.0
+fastapi==0.104.1
+uvicorn==0.24.0
+python-dotenv==1.0.0
+pydantic==2.5.0
+
+# Additional utility dependencies
+httpx==0.25.2
+aiofiles==23.2.0
+python-multipart==0.0.6
+
+# Development and testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+black==23.11.0
+flake8==6.1.0 

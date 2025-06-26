@@ -1,0 +1,85 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# RAG Application Repository Structure
+
+## Components Explanation
+
+### Core Structure
+- **src/**: Main application code
+- **data/**: Data storage and management
+- **tests/**: Comprehensive testing suite
+- **configs/**: Environment-specific configurations
+- **deployment/**: Infrastructure as code
+
+### Application Layers
+- **core/**: Core RAG components (embeddings, LLM, vector store)
+- **data/**: Data processing pipeline
+- **rag/**: RAG-specific logic and chains
+- **api/**: REST API layer
+- **monitoring/**: Observability and health checks
+
+### Application Core Layers
+- **embeddings.py**: Embedding models setup
+- **llm.py**: LLM configuration
+- **vector_store.py**: Vector database operations
+- **retriever.py**: Retrieval logic
+
+### Application Data Layers
+- **loader.py**: Document loaders
+- **preprocessor.py**: Text preprocessing
+- **chunker.py**: Text chunking strategies
+- **indexer.py**: Document indexing
+
+### Application RAG Layers
+- **pipeline.py**: Main RAG pipeline
+- **chains.py**: LangChain chains
+- **prompts.py**: Prompt templates
+- **post_processor.py**: Response post-processing
+
+### Application API Layers
+- **routes.py**: API endpoints
+- **models.py**: Pydantic models
+- **dependencies.py**: FastAPI dependencies
+- **middleware.py**: Custom middleware
+
+### Application Utils Layers
+- **file_utils.py**: File operations
+- **text_utils.py**: Text processing utilities
+- **validation.py**: Input validation
+- **exceptions.py**: Custom exceptions
+
+### Data Layers
+- **raw/**: Original documents
+- **processed/**: Processed documents
+- **embeddings/**: Cached embeddings
+- **models/**: Downloaded models
+
+### Scripts Layers
+- **setup_db.py**: Database initialization
+- **index_documents.py**: Batch document indexing
+- **evaluate_rag.py**: RAG evaluation
+- **migrate_data.py**: Data migration
+
+### Docs Layers
+- **api_documentation.md**: API documentation
+- **setup_guide.md**: Setup guide
+
+### Essential Files
+- **requirements.txt**: Python dependencies
+- **.env.example**: Environment variables template
+- **docker-compose.yml**: Local development setup
+- **pyproject.toml**: Modern Python project configuration
+
+### Best Practices Included
+- Separation of concerns with clear module boundaries
+- Configuration management for different environments
+- Comprehensive testing structure
+- Docker containerization
+- Infrastructure as code
+- Monitoring and observability
+- Documentation and notebooks for experimentation
+
+This structure scales well from development to production and follows Python best practices for maintainable code.
