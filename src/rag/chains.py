@@ -15,7 +15,7 @@ from langchain.chains.base import Chain
 from langchain.callbacks.manager import AsyncCallbackManagerForChainRun
 
 from ..core.llm import GeminiLLM
-from ..core.retriever import DocumentRetriever
+from ..core.retriever import SemanticRetriever
 from .prompts import PromptManager, PromptVersion
 from .post_processor import ResponsePostProcessor
 
@@ -102,35 +102,43 @@ class ConversationMemoryManager:
 class RAGChain(Chain):
     """Custom LangChain for RAG operations"""
     
+    llm: GeminiLLM
+    retriever: SemanticRetriever
+    prompt_manager: PromptManager
+    post_processor: ResponsePostProcessor
+    memory_manager: Optional[ConversationMemoryManager] = None
+    max_context_length: int = 15000
+    min_context_length: int = 100
+    max_sources: int = 5
+    stats: Dict[str, Any] = {}
+    
     def __init__(
         self,
         llm: GeminiLLM,
-        retriever: DocumentRetriever,
+        retriever: SemanticRetriever,
         prompt_manager: PromptManager,
         post_processor: ResponsePostProcessor,
         memory_manager: Optional[ConversationMemoryManager] = None,
         **kwargs
     ):
-        super().__init__(**kwargs)
-        self.llm = llm
-        self.retriever = retriever
-        self.prompt_manager = prompt_manager
-        self.post_processor = post_processor
-        self.memory_manager = memory_manager or ConversationMemoryManager()
-        
-        # Chain configuration
-        self.max_context_length = 15000  # Characters
-        self.min_context_length = 100
-        self.max_sources = 5
-        
-        # Statistics
-        self.stats = {
-            "queries_processed": 0,
-            "successful_retrievals": 0,
-            "failed_retrievals": 0,
-            "context_truncations": 0,
-            "total_processing_time": 0.0
-        }
+        super().__init__(
+            llm=llm,
+            retriever=retriever,
+            prompt_manager=prompt_manager,
+            post_processor=post_processor,
+            memory_manager=memory_manager or ConversationMemoryManager(),
+            max_context_length=15000,
+            min_context_length=100,
+            max_sources=5,
+            stats={
+                "queries_processed": 0,
+                "successful_retrievals": 0,
+                "failed_retrievals": 0,
+                "context_truncations": 0,
+                "total_processing_time": 0.0
+            },
+            **kwargs
+        )
     
     @property
     def input_keys(self) -> List[str]:
@@ -441,7 +449,7 @@ class StreamingRAGChain(RAGChain):
 
 def create_rag_chain(
     llm: GeminiLLM,
-    retriever: DocumentRetriever,
+    retriever: SemanticRetriever,
     prompt_manager: Optional[PromptManager] = None,
     post_processor: Optional[ResponsePostProcessor] = None,
     enable_streaming: bool = False,

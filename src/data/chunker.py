@@ -93,7 +93,7 @@ class TextChunker:
         self.header_pattern = re.compile(r'^#{1,6}\s+.*$', re.MULTILINE)
         
         # List item detection
-        self.list_pattern = re.compile(r'^\s*[-*+•]\s+.*$|^\s*\d+\.\s+.*$', re.MULTILINE)
+        self.list_pattern = re.compile(r'^\s*[-*+]\s+.*$|^\s*\d+\.\s+.*$', re.MULTILINE)
         
         # Code block detection
         self.code_block_pattern = re.compile(r'```.*?```', re.DOTALL)

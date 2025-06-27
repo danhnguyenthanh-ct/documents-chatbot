@@ -118,8 +118,8 @@ class TextPreprocessor:
         
         # Quote normalization patterns
         self.quote_patterns = [
-            (re.compile(r'[""]'), '"'),  # Smart quotes to straight quotes
-            (re.compile(r'['']'), "'"),  # Smart apostrophes to straight apostrophes
+            (re.compile(r'[\u201c\u201d]'), '"'),  # Smart quotes to straight quotes
+            (re.compile(r'[\u2018\u2019]'), "'"),  # Smart apostrophes to straight apostrophes
         ]
         
         # Structure preservation patterns

@@ -13,7 +13,6 @@ from functools import lru_cache
 import asyncio
 
 import google.generativeai as genai
-from google.generativeai.types import EmbedContentResponse
 from google.api_core import retry
 from google.api_core.exceptions import (
     GoogleAPIError, 
@@ -329,7 +328,7 @@ class GeminiEmbeddings:
             "max_batch_size": self.max_batch_size
         }
     
-    def health_check(self) -> bool:
+    async def health_check(self) -> bool:
         """
         Check if the embedding service is healthy
         
@@ -338,7 +337,9 @@ class GeminiEmbeddings:
         """
         try:
             # Test with a simple embedding
-            test_embedding = self.generate_embedding("health check")
+            test_embedding = await asyncio.create_task(
+                asyncio.to_thread(self.generate_embedding, "health check")
+            )
             return len(test_embedding) > 0
         except Exception as e:
             logger.error(f"Embedding service health check failed: {e}")

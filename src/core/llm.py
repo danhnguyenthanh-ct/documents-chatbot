@@ -504,7 +504,7 @@ class GeminiLLM:
         }
         logger.info("LLM statistics reset")
     
-    def health_check(self) -> bool:
+    async def health_check(self) -> bool:
         """
         Check if the LLM service is healthy
         
@@ -513,7 +513,9 @@ class GeminiLLM:
         """
         try:
             # Test with a simple generation
-            response = self.generate("Hello", max_tokens=5)
+            response = await asyncio.create_task(
+                asyncio.to_thread(self.generate, "Hello", max_tokens=5)
+            )
             return len(response.content) > 0
         except Exception as e:
             logger.error(f"LLM health check failed: {e}")

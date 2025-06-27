@@ -14,7 +14,7 @@ from enum import Enum
 from ..core.embeddings import GeminiEmbeddings
 from ..core.llm import GeminiLLM  
 from ..core.vector_store import QdrantVectorStore
-from ..core.retriever import DocumentRetriever
+from ..core.retriever import SemanticRetriever
 from .prompts import PromptManager
 from .chains import RAGChain, StreamingRAGChain, ConversationMemoryManager
 from .post_processor import ResponsePostProcessor
@@ -91,7 +91,7 @@ class RAGPipeline:
         self.enable_caching = enable_caching
         
         # Initialize components
-        self.retriever = DocumentRetriever(
+        self.retriever = SemanticRetriever(
             embeddings_service=embeddings_service,
             vector_store=vector_store,
             collection_name=collection_name
@@ -399,12 +399,12 @@ class RAGPipeline:
             
             # Check LLM
             health_status["components"]["llm"] = (
-                "healthy" if self.llm.health_check() else "unhealthy"
+                "healthy" if await self.llm.health_check() else "unhealthy"
             )
             
             # Check retriever
             health_status["components"]["retriever"] = (
-                "healthy" if self.retriever else "unhealthy"
+                "healthy" if self.retriever and await self.retriever.health_check() else "unhealthy"
             )
             
             # Overall health

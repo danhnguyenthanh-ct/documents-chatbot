@@ -170,7 +170,12 @@ class DocumentIndexer:
             storage_data = []
             for i, (chunk, doc_metadata) in enumerate(chunk_batch):
                 chunk_metadata = self._create_chunk_metadata(chunk, doc_metadata)
-                chunk_id = f"{doc_metadata['document_id']}_{chunk.chunk_id}"
+                # Generate integer ID by hashing the string ID
+                string_id = f"{doc_metadata['document_id']}_{chunk.chunk_id}"
+                chunk_id = abs(hash(string_id)) % (2**63)  # Convert to positive integer
+                
+                # Store the original string ID in metadata for reference
+                chunk_metadata["string_id"] = string_id
                 
                 storage_data.append((chunk_id, embeddings[i], chunk_metadata))
             

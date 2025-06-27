@@ -5,11 +5,10 @@ relevance scoring, re-ranking, query expansion, and hybrid search capabilities.
 """
 
 import logging
-from typing import List, Dict, Any, Optional, Tuple, Union
-import numpy as np
+from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 from enum import Enum
-import re
+import asyncio
 
 from .vector_store import QdrantVectorStore
 from .embeddings import GeminiEmbeddings
@@ -478,7 +477,7 @@ class SemanticRetriever:
         }
         logger.info("Retrieval statistics reset")
     
-    def health_check(self) -> bool:
+    async def health_check(self) -> bool:
         """
         Check if the retrieval system is healthy
         
@@ -487,7 +486,9 @@ class SemanticRetriever:
         """
         try:
             # Test basic retrieval
-            test_results = self.retrieve("test query", RetrievalConfig(max_results=1))
+            test_results = await asyncio.create_task(
+                asyncio.to_thread(self.retrieve, "test query", RetrievalConfig(max_results=1))
+            )
             return True  # If no exception, consider healthy
         except Exception as e:
             logger.error(f"Retrieval health check failed: {e}")
