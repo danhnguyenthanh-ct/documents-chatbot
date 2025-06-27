@@ -7,6 +7,14 @@ uvicorn==0.24.0
 python-dotenv==1.0.0
 pydantic==2.5.0
 
+# Document processing dependencies
+PyPDF2==3.0.1
+python-docx==1.1.0
+beautifulsoup4==4.12.2
+chardet==5.2.0
+lxml==4.9.3
+markdown==3.5.1
+
 # Additional utility dependencies
 httpx==0.25.2
 aiofiles==23.2.0
