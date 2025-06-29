@@ -486,8 +486,8 @@ class SemanticRetriever:
         """
         try:
             # Test basic retrieval
-            test_results = await asyncio.create_task(
-                asyncio.to_thread(self.retrieve, "test query", RetrievalConfig(max_results=1))
+            test_results = await asyncio.get_event_loop().run_in_executor(
+                None, self.retrieve, "test query", RetrievalConfig(max_results=1)
             )
             return True  # If no exception, consider healthy
         except Exception as e:

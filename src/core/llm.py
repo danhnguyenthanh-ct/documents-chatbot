@@ -276,6 +276,8 @@ class GeminiLLM:
         # Estimate tokens for rate limiting
         estimated_tokens = len(prompt.split()) * 1.3  # Rough estimation
         
+        print(f"prompt: {prompt}")
+        
         # Check rate limits
         self._wait_for_rate_limit(int(estimated_tokens))
         

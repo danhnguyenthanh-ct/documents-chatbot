@@ -232,10 +232,26 @@ class RAGChain(Chain):
             
             # Retrieve relevant documents
             try:
-                retrieved_docs = await self.retriever.retrieve_async(
+                retrieval_results = self.retriever.retrieve(
                     query, 
-                    limit=self.max_sources
-                )
+                    config=None
+                )[:self.max_sources]
+                
+                # Convert RetrievalResult objects to dictionaries
+                retrieved_docs = []
+                for result in retrieval_results:
+                    print(f"result: {result}")
+                    doc_dict = {
+                        "content": result.content,
+                        "relevance_score": result.relevance_score or result.score,
+                        "file_path": result.metadata.get("file_path", "Unknown"),
+                        "file_type": result.metadata.get("file_type", "unknown"),
+                        "document_id": result.document_id,
+                        "chunk_index": result.chunk_index,
+                        "metadata": result.metadata
+                    }
+                    retrieved_docs.append(doc_dict)
+                
                 self.stats["successful_retrievals"] += 1
             except Exception as e:
                 logger.error(f"Retrieval failed: {e}")
@@ -269,11 +285,15 @@ class RAGChain(Chain):
                 HumanMessage(content=context_prompt)
             ]
             
-            raw_response = await self.llm.agenerate_text(
-                messages=messages,
+            # Convert messages to simple prompt string for Gemini
+            prompt = f"{system_prompt}\n\nUser: {context_prompt}"
+            
+            llm_response = await self.llm.generate_async(
+                prompt=prompt,
                 max_tokens=2000,
                 temperature=0.1
             )
+            raw_response = llm_response.content
             
             # Post-process response
             processed_response = self.post_processor.process_response(
@@ -361,7 +381,21 @@ class StreamingRAGChain(RAGChain):
                 "timestamp": datetime.now().isoformat()
             }
             
-            retrieved_docs = await self.retriever.retrieve_async(query, limit=self.max_sources)
+            retrieval_results = self.retriever.retrieve(query, config=None)[:self.max_sources]
+            
+            # Convert RetrievalResult objects to dictionaries
+            retrieved_docs = []
+            for result in retrieval_results:
+                doc_dict = {
+                    "content": result.content,
+                    "relevance_score": result.relevance_score or result.score,
+                    "file_path": result.metadata.get("file_path", "Unknown"),
+                    "file_type": result.metadata.get("file_type", "unknown"),
+                    "document_id": result.document_id,
+                    "chunk_index": result.chunk_index,
+                    "metadata": result.metadata
+                }
+                retrieved_docs.append(doc_dict)
             
             yield {
                 "type": "retrieval_complete",
@@ -400,9 +434,10 @@ class StreamingRAGChain(RAGChain):
                 HumanMessage(content=context_prompt)
             ]
             
-            # Stream response generation
+            # Stream response generation  
+            prompt = f"{system_prompt}\n\nUser: {context_prompt}"
             response_chunks = []
-            async for chunk in self.llm.astream_text(messages):
+            async for chunk in self.llm.generate_stream_async(prompt):
                 response_chunks.append(chunk)
                 yield {
                     "type": "response_chunk",

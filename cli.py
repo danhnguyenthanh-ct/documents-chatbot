@@ -79,7 +79,9 @@ class CLITester:
             print("✅ Embeddings service initialized")
             
             # Initialize LLM
-            self.llm = GeminiLLM()
+            self.llm = GeminiLLM(
+                api_key=os.getenv("GOOGLE_API_KEY"),
+            )
             await self.llm.health_check()
             print("✅ LLM initialized")
             
@@ -315,16 +317,16 @@ class CLITester:
             )
             
             start_time = time.time()
-            results = await retriever.retrieve(query, k=limit)
+            results = retriever.retrieve(query)
             retrieval_time = time.time() - start_time
             
             print(f"📊 Retrieved {len(results)} documents in {retrieval_time:.2f}s")
             print("\n📚 Results:")
             
             for i, result in enumerate(results, 1):
-                print(f"{i}. Score: {result.get('score', 0):.3f}")
-                print(f"   File: {result.get('metadata', {}).get('file_path', 'Unknown')}")
-                print(f"   Content: {result.get('content', '')[:150]}...")
+                print(f"{i}. Score: {result.score:.3f}")
+                print(f"   File: {result.metadata.get('file_path', 'Unknown')}")
+                print(f"   Content: {result.content[:150]}...")
                 print()
         
         except Exception as e:

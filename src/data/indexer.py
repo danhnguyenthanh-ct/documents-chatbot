@@ -131,6 +131,7 @@ class DocumentIndexer:
     def _create_chunk_metadata(self, chunk: TextChunk, document_metadata: Dict[str, Any]) -> Dict[str, Any]:
         """Create metadata for vector storage"""
         metadata = {
+            "content": chunk.content,  # Store the actual chunk content
             "chunk_id": chunk.chunk_id,
             "document_id": document_metadata.get("document_id"),
             "file_path": document_metadata.get("file_path"),

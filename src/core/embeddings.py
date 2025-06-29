@@ -5,6 +5,7 @@ with caching, batch processing, and robust error handling.
 """
 
 import logging
+import os
 from typing import List, Dict, Any, Optional, Union
 import time
 import hashlib
@@ -12,7 +13,8 @@ import json
 from functools import lru_cache
 import asyncio
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from google.api_core import retry
 from google.api_core.exceptions import (
     GoogleAPIError, 
@@ -37,7 +39,7 @@ class GeminiEmbeddings:
     def __init__(
         self,
         api_key: str,
-        model_name: str = "models/embedding-001",
+        model_name: str = "embedding-001",
         max_batch_size: int = 100,
         max_retries: int = 3,
         retry_delay: float = 1.0,
@@ -54,6 +56,9 @@ class GeminiEmbeddings:
             retry_delay: Base delay between retries in seconds
             cache_size: LRU cache size for embeddings
         """
+        if api_key == "":
+            api_key = os.getenv("GOOGLE_API_KEY")
+        
         self.api_key = api_key
         self.model_name = model_name
         self.max_batch_size = max_batch_size
@@ -62,7 +67,7 @@ class GeminiEmbeddings:
         self.cache_size = cache_size
         
         # Configure Gemini client
-        genai.configure(api_key=api_key)
+        self.client = genai.Client(api_key=api_key)
         
         # Initialize statistics
         self.stats = {
@@ -119,16 +124,18 @@ class GeminiEmbeddings:
     def _generate_embedding_with_retry(self, text: str) -> List[float]:
         """Generate embedding with automatic retry logic"""
         try:
-            response = genai.embed_content(
+            response = self.client.models.embed_content(
                 model=self.model_name,
-                content=text,
-                task_type="retrieval_document"
+                contents=text,
+                config=types.EmbedContentConfig(
+                    task_type="RETRIEVAL_DOCUMENT"
+                )
             )
             
-            if not response or not hasattr(response, 'embedding'):
+            if not response or not response.embeddings or not response.embeddings[0].values:
                 raise EmbeddingError("Invalid response from Gemini embedding API")
             
-            return response.embedding
+            return response.embeddings[0].values
             
         except InvalidArgument as e:
             logger.error(f"Invalid argument for embedding generation: {e}")
@@ -337,8 +344,8 @@ class GeminiEmbeddings:
         """
         try:
             # Test with a simple embedding
-            test_embedding = await asyncio.create_task(
-                asyncio.to_thread(self.generate_embedding, "health check")
+            test_embedding = await asyncio.get_event_loop().run_in_executor(
+                None, self.generate_embedding, "health check"
             )
             return len(test_embedding) > 0
         except Exception as e:
@@ -349,7 +356,7 @@ class GeminiEmbeddings:
 # Utility functions for common operations
 def create_embeddings_service(
     api_key: str, 
-    model_name: str = "models/embedding-001"
+    model_name: str = "embedding-001"
 ) -> GeminiEmbeddings:
     """
     Factory function to create embeddings service
@@ -380,5 +387,5 @@ def get_default_embeddings_service() -> Optional[GeminiEmbeddings]:
         logger.warning("GOOGLE_API_KEY not found in environment variables")
         return None
     
-    model_name = os.getenv("EMBEDDING_MODEL", "models/embedding-001")
+    model_name = os.getenv("EMBEDDING_MODEL", "embedding-001")
     return GeminiEmbeddings(api_key=api_key, model_name=model_name) 
