@@ -534,7 +534,7 @@ def get_default_retriever(
     """
     import os
     
-    collection_name = os.getenv("COLLECTION_NAME", "seller_documents")
+    collection_name = os.getenv("COLLECTION_NAME", "confluence_documents")
     
     config = RetrievalConfig(
         max_results=int(os.getenv("RETRIEVAL_MAX_RESULTS", "10")),
