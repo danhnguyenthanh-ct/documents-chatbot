@@ -234,7 +234,7 @@ class DocumentIndexer:
             # Load document
             logger.info(f"Loading document: {file_path}")
             loaded_doc = self.document_loader.load_document(file_path)
-            
+
             # Check for duplicates
             if self._is_duplicate(loaded_doc.metadata.content_hash):
                 self.stats["duplicates_skipped"] += 1
