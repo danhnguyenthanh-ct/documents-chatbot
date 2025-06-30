@@ -14,6 +14,10 @@ import time
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from datetime import datetime
+from rich.console import Console
+from rich.markdown import Markdown
+
+console = Console()
 
 import dotenv
 
@@ -250,8 +254,8 @@ class CLITester:
             response = await self.pipeline.process_query(request)
             processing_time = time.time() - start_time
             
-            print(f"📝 Answer:")
-            print(response.answer)
+            console.print("📝 Answer:", style="bold green")
+            console.print(Markdown(response.answer))
             print("\n📚 Sources:")
             for i, source in enumerate(response.sources, 1):
                 print(f"{i}. File: {source.get('file_path', 'Unknown')}")
@@ -294,7 +298,9 @@ class CLITester:
                 response = await self.pipeline.process_query(request)
                 processing_time = time.time() - start_time
                 
-                print(f"🤖 Bot: {response.answer}")
+                # Print bot response with markdown formatting
+                console.print("🤖 Bot:", style="bold cyan")
+                console.print(Markdown(response.answer))
                 print(f"⏱️  ({processing_time:.2f}s, {len(response.sources)} sources)\n")
                 
             except KeyboardInterrupt:

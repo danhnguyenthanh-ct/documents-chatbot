@@ -90,7 +90,6 @@ Be accurate, concise, and cite your sources when possible.""",
 
 **Core Principles:**
 - Provide accurate information based solely on the given context
-- Cite specific sources when making claims
 - Acknowledge when information is insufficient
 - Maintain a professional yet conversational tone
 - Prioritize clarity and usefulness
