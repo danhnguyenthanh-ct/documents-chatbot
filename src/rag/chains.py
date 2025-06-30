@@ -240,7 +240,6 @@ class RAGChain(Chain):
                 # Convert RetrievalResult objects to dictionaries
                 retrieved_docs = []
                 for result in retrieval_results:
-                    print(f"result: {result}")
                     doc_dict = {
                         "content": result.content,
                         "relevance_score": result.relevance_score or result.score,

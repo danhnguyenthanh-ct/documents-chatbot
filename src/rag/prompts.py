@@ -10,6 +10,7 @@ from enum import Enum
 from datetime import datetime
 import re
 from dataclasses import dataclass
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -99,10 +100,7 @@ Be accurate, concise, and cite your sources when possible.""",
 - Use bullet points or numbering when listing multiple items
 - Provide context and explain technical terms when necessary
 - If the context doesn't contain relevant information, say so clearly
-
-**Citation Format:**
-- Reference sources as [Source: filename/title]
-- Include specific sections when available""",
+""",
             [],
             PromptType.SYSTEM,
             PromptVersion.V2_ENHANCED,
@@ -367,7 +365,6 @@ Use the format [Source: document_name] after each claim.""",
                 source_name = source_name.split("/")[-1]
             source_refs[i] = f"[Source: {source_name}]"
         
-        # Add citations at the end
         citation_text = "\n\n**Sources:**\n"
         for i, source in enumerate(sources):
             file_path = source.get("file_path", "Unknown")
